@@ -1,0 +1,6 @@
+# build remnants
+**/*.exe
+
+# backups
+**/*.bak
+**/~*
