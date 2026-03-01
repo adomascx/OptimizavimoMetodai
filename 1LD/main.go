@@ -6,13 +6,13 @@ import (
 	"math"
 )
 
-type tiksloFunkcija func(x float64) float64
-
 // mano studento skaitmenys
 var A float64 = 3
 var B float64 = 9
 
-// Tikslo funkcija + jos 1ojo ir 2ojo laipsnio isvestines
+type tiksloFunkcija func(x float64) float64
+
+// Tikslo funkcija + jos 1osios ir 2osios eilės isvestines
 func funkcija(x float64) (y float64) {
 	return math.Pow(x*x-A, 2) / (B - 1)
 }
@@ -30,6 +30,8 @@ func intervaloDalijimoPusiauAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIte
 
 	funkcijosSkaiciavimuSk = 0
 
+	xm := (l + r) / 2
+
 	for i := 0; i < maxIter; i++ {
 
 		if (r - l) <= epsilon {
@@ -38,24 +40,24 @@ func intervaloDalijimoPusiauAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIte
 		}
 
 		L := r - l
-		xm := (l + r) / 2
+
 		x1 := l + L/4
 		x2 := r - L/4
 
 		if f(x1) < f(xm) {
 			r = xm
-			funkcijosSkaiciavimuSk += 2
+			xm = x1
 
 		} else if f(x2) < f(xm) {
 			l = xm
-			funkcijosSkaiciavimuSk += 3
+			xm = x2
 
 		} else {
 			l = x1
 			r = x2
-			funkcijosSkaiciavimuSk += 3
 
 		}
+		funkcijosSkaiciavimuSk += 2
 
 	}
 
@@ -77,7 +79,7 @@ func auksinioPjuvioAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIter int) (x
 	for i := 0; i < maxIter; i++ {
 
 		if (r - l) <= epsilon {
-			x := 0.5 * (l + r)
+			x := (l + r) / 2
 			return x, f(x), i, funkcijosSkaiciavimuSk + 1, nil
 		}
 
@@ -92,10 +94,10 @@ func auksinioPjuvioAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIter int) (x
 			x1 = r - tau*(r-l)
 
 		}
-		funkcijosSkaiciavimuSk += 2
+		funkcijosSkaiciavimuSk += 1
 	}
 
-	x := 0.5 * (l + r)
+	x := (l + r) / 2
 	return x, f(x), maxIter, funkcijosSkaiciavimuSk + 1, fmt.Errorf("pasiektas maksimalus iteracijų skaičius.")
 }
 
@@ -108,7 +110,7 @@ func niutonoAlgo(f, df, d2f tiksloFunkcija, x0, epsilon float64, maxIter int) (x
 	for i := 0; i < maxIter; i++ {
 
 		if math.Abs(df(x)) <= epsilon {
-			return x, f(x), i, funkcijosSkaiciavimuSk, nil
+			return x, f(x), i, funkcijosSkaiciavimuSk + 1, nil
 		}
 
 		xNext := x - df(x)/d2f(x)
@@ -121,7 +123,7 @@ func niutonoAlgo(f, df, d2f tiksloFunkcija, x0, epsilon float64, maxIter int) (x
 		x = xNext
 	}
 
-	return x, f(x), maxIter, funkcijosSkaiciavimuSk, fmt.Errorf("pasiektas maksimalus iteracijų skaičius.")
+	return x, f(x), maxIter, funkcijosSkaiciavimuSk + 1, fmt.Errorf("pasiektas maksimalus iteracijų skaičius.")
 }
 
 func main() {
