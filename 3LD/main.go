@@ -90,6 +90,28 @@ func gradientoBaudosFunkcija(X kintamieji, r float64) kintamieji {
 	return grad
 }
 
+func maxGammaPagalNeneigiamuma(p, s kintamieji, maxGamma float64) float64 {
+	const eta = 0.999
+
+	m := maxGamma
+
+	if s.x < 0 {
+		m = math.Min(m, eta*p.x/(-s.x))
+	}
+	if s.y < 0 {
+		m = math.Min(m, eta*p.y/(-s.y))
+	}
+	if s.z < 0 {
+		m = math.Min(m, eta*p.z/(-s.z))
+	}
+
+	if m < 0 {
+		return 0
+	}
+
+	return m
+}
+
 func greiciausiojoNusileidimoAlgo(f funkcija, gf gradientas, p0 kintamieji, eps, epsGamma, initialStep, maxGamma float64, maxIter int) (p kintamieji, value float64, k int) {
 	p = p0
 
@@ -103,24 +125,35 @@ func greiciausiojoNusileidimoAlgo(f funkcija, gf gradientas, p0 kintamieji, eps,
 		}
 
 		s := kintamieji{x: -g.x, y: -g.y, z: -g.z}
+
+		maxGammaLocal := maxGammaPagalNeneigiamuma(p, s, maxGamma)
+
+		if maxGammaLocal <= epsGamma {
+			break
+		}
+
 		phi := func(gamma float64) float64 {
-			cand := kintamieji{x: p.x + gamma*s.x, y: p.y + gamma*s.y, z: p.z + gamma*s.z}
+			cand := kintamieji{
+				x: p.x + gamma*s.x,
+				y: p.y + gamma*s.y,
+				z: p.z + gamma*s.z,
+			}
 			return f(cand)
 		}
 
 		a := 0.0
-		b := initialStep
+		b := math.Min(initialStep, maxGammaLocal)
+
 		fa := phi(a)
 		fb := phi(b)
 
-		for b < maxGamma && fb < fa {
-
+		for b < maxGammaLocal && fb < fa {
 			a = b
 			fa = fb
 
 			b *= 2
-			if b > maxGamma {
-				b = maxGamma
+			if b > maxGammaLocal {
+				b = maxGammaLocal
 			}
 
 			fb = phi(b)
@@ -292,6 +325,6 @@ func main() {
 	fmt.Printf("\n%v\n", strings.Repeat("=", 38))
 	fmt.Println("Baudos funkcijos minimizavimas")
 	for _, taskas := range taskai {
-		outputOptimizationResults(taskas, eps, epsGamma, initialStep, maxGamma, maxIter, true)
+		outputOptimizationResults(taskas, eps, epsGamma, initialStep, maxGamma, maxIter, false)
 	}
 }
