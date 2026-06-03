@@ -4,3 +4,6 @@
 # backups
 **/*.bak
 **/~*
+
+# separate repo for group project
+/Grupine
