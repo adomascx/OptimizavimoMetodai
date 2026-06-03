@@ -32,7 +32,7 @@ func intervaloDalijimoPusiauAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIte
 
 	xm := (l + r) / 2
 
-	for i := 0; i < maxIter; i++ {
+	for i := range maxIter {
 
 		if (r - l) <= epsilon {
 			x := (l + r) / 2
@@ -76,7 +76,7 @@ func auksinioPjuvioAlgo(f tiksloFunkcija, l, r, epsilon float64, maxIter int) (x
 	x1 := r - tau*(r-l)
 	x2 := l + tau*(r-l)
 
-	for i := 0; i < maxIter; i++ {
+	for i := range maxIter {
 
 		if (r - l) <= epsilon {
 			x := (l + r) / 2
@@ -107,7 +107,7 @@ func niutonoAlgo(f, df, d2f tiksloFunkcija, x0, epsilon float64, maxIter int) (x
 
 	x := x0
 
-	for i := 0; i < maxIter; i++ {
+	for i := range maxIter {
 
 		if math.Abs(df(x)) <= epsilon {
 			return x, f(x), i, funkcijosSkaiciavimuSk + 1, nil

@@ -197,8 +197,11 @@ func deformuojamoSimpleksoAlgo(f funkcija, p0 point, alpha, gamma, beta, eps flo
 		vertices := [3]point{x1, x2, x3}
 		values := [3]float64{f1, f2, f3}
 
-		for i := 0; i < 2; i++ {
-			for j := i + 1; j < 3; j++ {
+		for i := range 2 {
+			for j := range 3 {
+				if j <= i {
+					continue
+				}
 				if values[j] < values[i] {
 					values[i], values[j] = values[j], values[i]
 					vertices[i], vertices[j] = vertices[j], vertices[i]
@@ -322,9 +325,9 @@ func exportPlotData(file string, points []startPoint, trueMin float64, gdHistory
 	}
 
 	fmt.Fprintln(out, "# GRID i j x y gradMag")
-	for j := 0; j < gridN; j++ {
+	for j := range gridN {
 		y := float64(j) / float64(gridN-1)
-		for i := 0; i < gridN; i++ {
+		for i := range gridN {
 			x := float64(i) / float64(gridN-1)
 			gx := y * (y + 2*x - 1) / 8
 			gy := x * (2*y + x - 1) / 8
